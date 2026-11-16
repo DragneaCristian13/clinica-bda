@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import camp %}
+{% block title %}{{ 'Cont nou' if nou else 'Editare cont' }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+  <h1 class="h3 mb-3">{{ 'Cont nou' if nou else 'Editare cont' }}</h1>
+  <div class="card"><div class="card-body">
+    <form method="post">
+      {{ camp('email', 'Email', item.email, type='email', required=true) }}
+      <div class="mb-3">
+        <label class="form-label" for="id_rol">Rol *</label>
+        <select class="form-select" id="id_rol" name="id_rol" required onchange="arataAsociere()">
+          {% for r in roluri %}
+            <option value="{{ r.id_rol }}" data-rol="{{ r.denumire }}" {{ 'selected' if item.id_rol|string == r.id_rol|string }}>{{ r.denumire }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3" id="bloc-medic">
+        <label class="form-label" for="id_medic">Medicul căruia îi aparține contul *</label>
+        <select class="form-select" id="id_medic" name="id_medic">
+          <option value="">— alege —</option>
+          {% for m in medici %}<option value="{{ m.id_medic }}" {{ 'selected' if item.id_medic|string == m.id_medic|string }}>{{ m.eticheta }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="mb-3" id="bloc-pacient">
+        <label class="form-label" for="id_pacient">Pacientul căruia îi aparține contul *</label>
+        <select class="form-select" id="id_pacient" name="id_pacient">
+          <option value="">— alege —</option>
+          {% for p in pacienti %}<option value="{{ p.id_pacient }}" {{ 'selected' if item.id_pacient|string == p.id_pacient|string }}>{{ p.eticheta }}</option>{% endfor %}
+        </select>
+      </div>
+      {{ camp('parola', 'Parolă' if nou else 'Parolă nouă (lasă gol ca să rămână neschimbată)', type='password',
+              required=nou, help='Minimum 8 caractere. Se salvează doar hash-ul bcrypt.') }}
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="activ" name="activ" {{ 'checked' if item.activ and item.activ != 'f' }}>
+        <label class="form-check-label" for="activ">Cont activ (poate să se autentifice)</label>
+      </div>
+      <button class="btn btn-primary">Salvează</button>
+      <a class="btn btn-link" href="{{ url_for('auth.utilizatori_list') }}">Renunță</a>
+    </form>
+  </div></div>
+</div></div>
+<script>
+  function arataAsociere() {
+    const rol = document.querySelector('#id_rol option:checked').dataset.rol;
+    document.getElementById('bloc-medic').style.display = rol === 'medic' ? '' : 'none';
+    document.getElementById('bloc-pacient').style.display = rol === 'pacient' ? '' : 'none';
+  }
+  arataAsociere();
+</script>
+{% endblock %}

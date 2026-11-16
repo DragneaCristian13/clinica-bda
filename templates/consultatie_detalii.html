@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% from "_macros.html" import buton_stergere with context %}
+{% block title %}Consultație{% endblock %}
+{% block content %}
+{% set poate_scrie = are_rol('admin') or (are_rol('medic') and g.user.id_medic == c.id_medic) %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Consultație — {{ c.data_ora|dt }}</h1>
+  {% if poate_scrie %}
+  <div>
+    <a class="btn btn-outline-secondary" href="{{ url_for('consultatii.editare', id=c.id_consultatie) }}"><i class="bi bi-pencil"></i> Editează</a>
+    {{ buton_stergere(url_for('consultatii.stergere', id=c.id_consultatie), 'Ștergi consultația și rețetele ei?') }}
+  </div>
+  {% endif %}
+</div>
+<div class="row g-3">
+  <div class="col-lg-4"><div class="card"><div class="card-body">
+    <dl class="mb-0">
+      <dt>Pacient</dt><dd>
+        {% if not are_rol('pacient') %}<a href="{{ url_for('pacienti.detalii', id=c.id_pacient) }}">{{ c.pacient }}</a>{% else %}{{ c.pacient }}{% endif %}
+        <br><small class="text-muted">CNP {{ c.cnp }}</small></dd>
+      <dt>Medic</dt><dd>dr. {{ c.medic }} <br><small class="text-muted">{{ c.specializare }} · parafa {{ c.cod_parafa }}</small></dd>
+      <dt>Motivul programării</dt><dd>{{ c.motiv or '—' }}</dd>
+    </dl>
+  </div></div></div>
+  <div class="col-lg-8"><div class="card"><div class="card-body">
+    <h2 class="h6 text-muted">Simptome</h2><p>{{ c.simptome or '—' }}</p>
+    <h2 class="h6 text-muted">Diagnostic</h2><p class="fw-semibold">{{ c.diagnostic or '—' }}</p>
+    <h2 class="h6 text-muted">Recomandări</h2><p class="mb-0">{{ c.recomandari or '—' }}</p>
+  </div></div></div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+  <h2 class="h5 mb-0">Rețete</h2>
+  {% if poate_scrie %}
+    <a class="btn btn-primary btn-sm" href="{{ url_for('consultatii.reteta_creare', id=c.id_consultatie) }}"><i class="bi bi-prescription2"></i> Rețetă nouă</a>
+  {% endif %}
+</div>
+{% for r in retete %}
+  <div class="card mb-3"><div class="card-body">
+    <div class="d-flex justify-content-between">
+      <div><strong>Rețeta #{{ r.id_reteta }}</strong> · emisă {{ r.data_emiterii|d }} ·
+        valabilă {{ r.valabilitate_zile }} zile (până la {{ r.valabila_pana|d }})</div>
+      {% if poate_scrie %}
+      <div class="text-nowrap">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('consultatii.reteta_editare', id_reteta=r.id_reteta) }}"><i class="bi bi-pencil"></i></a>
+        {{ buton_stergere(url_for('consultatii.reteta_stergere', id_reteta=r.id_reteta), 'Ștergi rețeta?') }}
+      </div>
+      {% endif %}
+    </div>
+    <table class="table table-sm mt-2 mb-0">
+      <thead><tr><th>Medicament</th><th>Doză</th><th>Frecvență</th><th>Durată</th><th>Cutii</th></tr></thead>
+      <tbody>
+      {% for l in r.linii %}
+        <tr><td>{{ l.denumire }} {{ l.concentratie }} <small class="text-muted">({{ l.forma }})</small></td>
+            <td>{{ l.doza }}</td><td>{{ l.frecventa }}</td><td>{{ l.durata_zile }} zile</td><td>{{ l.cantitate }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div></div>
+{% else %}
+  <p class="text-muted">Nicio rețetă emisă la această consultație.</p>
+{% endfor %}
+{% endblock %}

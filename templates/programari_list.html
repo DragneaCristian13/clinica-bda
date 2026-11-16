@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, buton_stergere, paginare with context %}
+{% block title %}Programări{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">{{ 'Programările mele' if are_rol('medic', 'pacient') else 'Programări' }}
+    <small class="text-muted fs-6">({{ total }})</small></h1>
+  {% if are_rol('admin', 'receptioner', 'pacient') %}
+    <a class="btn btn-primary" href="{{ url_for('programari.creare') }}"><i class="bi bi-calendar-plus"></i> Programare nouă</a>
+  {% endif %}
+</div>
+
+<form class="row g-2 mb-3 align-items-end">
+  {% if not are_rol('pacient') %}
+  <div class="col-md-3"><label class="form-label small">Pacient</label>
+    <input class="form-control" name="q" value="{{ f.q }}" placeholder="nume pacient"></div>
+  {% endif %}
+  {% if are_rol('admin', 'receptioner') %}
+  <div class="col-md-3"><label class="form-label small">Medic</label>
+    <select class="form-select" name="medic"><option value="">toți</option>
+      {% for m in medici %}<option value="{{ m.id_medic }}" {{ 'selected' if f.medic == m.id_medic|string }}>{{ m.nume }}</option>{% endfor %}
+    </select></div>
+  {% endif %}
+  <div class="col-md-2"><label class="form-label small">Status</label>
+    <select class="form-select" name="status"><option value="">oricare</option>
+      {% for s in statusuri %}<option {{ 'selected' if f.status == s }}>{{ s }}</option>{% endfor %}
+    </select></div>
+  <div class="col-md-2"><label class="form-label small">De la</label><input class="form-control" type="date" name="de_la" value="{{ f.de_la }}"></div>
+  <div class="col-md-2"><label class="form-label small">Până la</label><input class="form-control" type="date" name="pana_la" value="{{ f.pana_la }}"></div>
+  <div class="col-auto"><button class="btn btn-outline-primary">Filtrează</button>
+    <a class="btn btn-link" href="{{ url_for('programari.lista') }}">Resetează</a></div>
+</form>
+
+<div class="card"><div class="table-responsive"><table class="table table-hover mb-0">
+  <thead><tr><th>Data</th>{% if not are_rol('pacient') %}<th>Pacient</th>{% endif %}
+             {% if not are_rol('medic') %}<th>Medic</th>{% endif %}<th>Motiv</th><th>Status</th><th class="text-end">Acțiuni</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td class="text-nowrap">{{ r.data_ora|dt }}<br><small class="text-muted">{{ r.durata_minute }} min</small></td>
+      {% if not are_rol('pacient') %}<td><a href="{{ url_for('pacienti.detalii', id=r.id_pacient) }}">{{ r.pacient }}</a></td>{% endif %}
+      {% if not are_rol('medic') %}<td>{{ r.medic }}<br><small class="text-muted">{{ r.specializare }}</small></td>{% endif %}
+      <td>{{ r.motiv or '—' }}</td>
+      <td>{{ status_badge(r.status) }}</td>
+      <td class="text-end text-nowrap">
+        {% if r.id_consultatie and not are_rol('receptioner') %}
+          <a class="btn btn-sm btn-outline-success" href="{{ url_for('consultatii.detalii', id=r.id_consultatie) }}">Consultația</a>
+        {% elif r.status == 'finalizat' and are_rol('admin', 'medic') %}
+          <a class="btn btn-sm btn-success" href="{{ url_for('consultatii.creare', programare=r.id_programare) }}">Completează consultația</a>
+        {% endif %}
+        {% if r.status == 'programat' %}
+          <form method="post" action="{{ url_for('programari.schimba_status', id=r.id_programare) }}" class="d-inline">
+            {% if are_rol('admin', 'medic') %}
+              <button name="status" value="finalizat" class="btn btn-sm btn-outline-success" title="Finalizează"><i class="bi bi-check-lg"></i></button>
+            {% endif %}
+            <button name="status" value="anulat" class="btn btn-sm btn-outline-secondary" title="Anulează"
+                    onclick="return confirm('Anulezi programarea?')"><i class="bi bi-x-lg"></i></button>
+          </form>
+        {% endif %}
+        {% if are_rol('admin', 'receptioner') %}
+          <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('programari.editare', id=r.id_programare) }}"><i class="bi bi-pencil"></i></a>
+          {{ buton_stergere(url_for('programari.stergere', id=r.id_programare)) }}
+        {% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="text-center text-muted">Nicio programare găsită.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div></div>
+<div class="mt-3">{{ paginare(pagina, pagini, 'programari.lista') }}</div>
+{% endblock %}

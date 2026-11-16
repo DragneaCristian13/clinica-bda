@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, buton_stergere with context %}
+{% block title %}{{ p.nume }} {{ p.prenume }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">{{ p.nume }} {{ p.prenume }}</h1>
+  <div>
+    {% if are_rol('admin', 'receptioner') %}
+      <a class="btn btn-primary" href="{{ url_for('programari.creare', pacient=p.id_pacient) }}"><i class="bi bi-calendar-plus"></i> Programare</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('pacienti.editare', id=p.id_pacient) }}"><i class="bi bi-pencil"></i> Editează</a>
+      {{ buton_stergere(url_for('pacienti.stergere', id=p.id_pacient), 'Ștergi pacientul și tot istoricul lui?') }}
+    {% endif %}
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card"><div class="card-body">
+      <dl class="row mb-0">
+        <dt class="col-5">CNP</dt><dd class="col-7"><code>{{ p.cnp }}</code></dd>
+        <dt class="col-5">Născut(ă)</dt><dd class="col-7">{{ p.data_nasterii|d }} ({{ p.varsta }} ani)</dd>
+        <dt class="col-5">Sex</dt><dd class="col-7">{{ p.sex }}</dd>
+        <dt class="col-5">Telefon</dt><dd class="col-7">{{ p.telefon or '—' }}</dd>
+        <dt class="col-5">Email</dt><dd class="col-7">{{ p.email or '—' }}</dd>
+        <dt class="col-5">Adresă</dt><dd class="col-7">{{ p.adresa or '—' }}</dd>
+        <dt class="col-5">Cont aplicație</dt><dd class="col-7">{{ p.cont or 'fără cont' }}</dd>
+      </dl>
+    </div></div>
+  </div>
+  <div class="col-lg-8">
+    <h2 class="h5">Programări și istoric medical</h2>
+    <div class="card"><table class="table table-sm table-hover mb-0">
+      <thead><tr><th>Data</th><th>Medic</th><th>Motiv</th><th>Status</th><th>Diagnostic</th></tr></thead>
+      <tbody>
+      {% for r in programari %}
+        <tr>
+          <td>{{ r.data_ora|dt }}</td><td>{{ r.medic }}<br><small class="text-muted">{{ r.specializare }}</small></td>
+          <td>{{ r.motiv or '—' }}</td><td>{{ status_badge(r.status) }}</td>
+          <td>
+            {% if r.id_consultatie and not are_rol('receptioner') %}
+              <a href="{{ url_for('consultatii.detalii', id=r.id_consultatie) }}">{{ r.diagnostic or 'vezi consultația' }}</a>
+            {% elif r.id_consultatie %}<span class="text-muted">consultație înregistrată</span>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="text-muted text-center">Nicio programare.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </div>
+</div>
+{% endblock %}

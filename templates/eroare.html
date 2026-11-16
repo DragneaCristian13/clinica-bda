@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Eroare {{ cod }}{% endblock %}
+{% block content %}
+<div class="text-center mt-5">
+  <div class="display-3 text-muted">{{ cod }}</div>
+  <p class="lead">{{ mesaj }}</p>
+  <a class="btn btn-primary" href="{{ url_for('index') }}">Înapoi la pagina principală</a>
+</div>
+{% endblock %}

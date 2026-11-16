@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Acasă{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">Bună, {{ g.user.nume }}</h1>
+  <a class="btn btn-primary" href="{{ url_for('programari.creare') }}"><i class="bi bi-calendar-plus"></i> Fă o programare</a>
+</div>
+<h2 class="h5">Programările mele viitoare</h2>
+<div class="card"><table class="table mb-0">
+  <thead><tr><th>Data</th><th>Medic</th><th>Specializare</th><th>Motiv</th><th></th></tr></thead>
+  <tbody>
+  {% for r in urmatoare %}
+    <tr><td>{{ r.data_ora|dt }}</td><td>{{ r.medic }}</td><td>{{ r.specializare }}</td><td>{{ r.motiv or '—' }}</td>
+      <td class="text-end">
+        <form method="post" action="{{ url_for('programari.schimba_status', id=r.id_programare) }}"
+              onsubmit="return confirm('Anulezi programarea?')">
+          <button name="status" value="anulat" class="btn btn-sm btn-outline-danger">Anulează</button>
+        </form>
+      </td></tr>
+  {% else %}
+    <tr><td colspan="5" class="text-muted text-center">Nu ai programări viitoare.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+<p class="mt-3"><a href="{{ url_for('consultatii.lista') }}">Vezi istoricul medical și rețetele →</a></p>
+{% endblock %}

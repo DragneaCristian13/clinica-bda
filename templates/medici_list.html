@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_macros.html" import buton_stergere with context %}
+{% block title %}Medici{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Medici</h1>
+  {% if are_rol('admin') %}
+    <a class="btn btn-primary" href="{{ url_for('medici.creare') }}"><i class="bi bi-plus-lg"></i> Medic nou</a>
+  {% endif %}
+</div>
+<form class="row g-2 mb-3">
+  <div class="col-md-4">
+    <select class="form-select" name="specializare" onchange="this.form.submit()">
+      <option value="">Toate specializările</option>
+      {% for s in specializari %}
+        <option value="{{ s.id_specializare }}" {{ 'selected' if id_spec == s.id_specializare|string }}>{{ s.denumire }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</form>
+<div class="card"><table class="table table-hover mb-0">
+  <thead><tr><th>Nume</th><th>Specializare</th><th>Parafă</th><th>Telefon</th><th>Email</th>
+             <th>Programări viitoare</th>{% if are_rol('admin') %}<th class="text-end">Acțiuni</th>{% endif %}</tr></thead>
+  <tbody>
+  {% for m in rows %}
+    <tr>
+      <td>dr. {{ m.nume }} {{ m.prenume }}</td><td>{{ m.specializare }}</td><td><code>{{ m.cod_parafa }}</code></td>
+      <td>{{ m.telefon or '—' }}</td><td>{{ m.email }}</td><td>{{ m.programari_viitoare }}</td>
+      {% if are_rol('admin') %}
+      <td class="text-end text-nowrap">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('medici.editare', id=m.id_medic) }}"><i class="bi bi-pencil"></i></a>
+        {{ buton_stergere(url_for('medici.stergere', id=m.id_medic)) }}
+      </td>
+      {% endif %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

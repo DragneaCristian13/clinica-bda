@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "_macros.html" import camp %}
+{% block title %}{{ 'Programare nouă' if nou else 'Editare programare' }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-8">
+  <h1 class="h3 mb-3">{{ 'Programare nouă' if nou else 'Editare programare' }}</h1>
+  <div class="card"><div class="card-body">
+    <form method="post">
+      {% if not are_rol('pacient') %}
+      <div class="mb-3">
+        <label class="form-label" for="id_pacient">Pacient *</label>
+        <select class="form-select" id="id_pacient" name="id_pacient" required>
+          <option value="">— alege pacientul —</option>
+          {% for p in pacienti %}
+            <option value="{{ p.id_pacient }}" {{ 'selected' if item.id_pacient|string == p.id_pacient|string }}>{{ p.eticheta }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+      <div class="mb-3">
+        <label class="form-label" for="id_medic">Medic *</label>
+        <select class="form-select" id="id_medic" name="id_medic" required>
+          <option value="">— alege medicul —</option>
+          {% for m in medici %}
+            <option value="{{ m.id_medic }}" {{ 'selected' if item.id_medic|string == m.id_medic|string }}>{{ m.eticheta }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="row">
+        <div class="col-md-6">{{ camp('data_ora', 'Data și ora', item.data_ora|input_dt, type='datetime-local', required=true) }}</div>
+        <div class="col-md-3">{{ camp('durata_minute', 'Durată (min)', item.durata_minute, type='number', attrs='min="10" max="180" step="5"') }}</div>
+        {% if not nou %}
+        <div class="col-md-3 mb-3">
+          <label class="form-label" for="status">Status</label>
+          <select class="form-select" id="status" name="status">
+            {% for s in statusuri %}<option {{ 'selected' if item.status == s }}>{{ s }}</option>{% endfor %}
+          </select>
+        </div>
+        {% endif %}
+      </div>
+      {{ camp('motiv', 'Motivul programării', item.motiv) }}
+      <button class="btn btn-primary">Salvează</button>
+      <a class="btn btn-link" href="{{ url_for('programari.lista') }}">Renunță</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

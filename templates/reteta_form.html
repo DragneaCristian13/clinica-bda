@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Rețetă{% endblock %}
+{% block content %}
+<h1 class="h3 mb-1">{{ 'Rețetă nouă' if nou else 'Editare rețetă' }}</h1>
+<p class="text-muted">Pacient: <strong>{{ c.pacient }}</strong> · diagnostic: {{ c.diagnostic or '—' }}</p>
+<div class="card"><div class="card-body">
+  <form method="post">
+    <div class="row mb-3"><div class="col-md-3">
+      <label class="form-label" for="valabilitate_zile">Valabilitate (zile)</label>
+      <input class="form-control" type="number" id="valabilitate_zile" name="valabilitate_zile"
+             min="1" max="365" value="{{ reteta.valabilitate_zile }}" required>
+    </div></div>
+    <table class="table table-sm align-middle">
+      <thead><tr><th style="width:35%">Medicament</th><th>Doză</th><th>Frecvență</th><th>Durată (zile)</th><th>Cutii</th></tr></thead>
+      <tbody>
+      {% for i in range(1, n + 1) %}
+        {% set l = linii[i-1] if linii|length >= i else {} %}
+        <tr>
+          <td><select class="form-select form-select-sm" name="med_{{ i }}">
+            <option value="">—</option>
+            {% for m in medicamente %}
+              <option value="{{ m.id_medicament }}" {{ 'selected' if l.id_medicament|string == m.id_medicament|string }}>{{ m.eticheta }}</option>
+            {% endfor %}
+          </select></td>
+          <td><input class="form-control form-control-sm" name="doza_{{ i }}" value="{{ l.doza or '' }}" placeholder="1 comprimat"></td>
+          <td><input class="form-control form-control-sm" name="frecventa_{{ i }}" value="{{ l.frecventa or '' }}" placeholder="de 2 ori pe zi"></td>
+          <td><input class="form-control form-control-sm" type="number" min="1" max="365" name="durata_{{ i }}" value="{{ l.durata_zile or '' }}" placeholder="7"></td>
+          <td><input class="form-control form-control-sm" type="number" min="1" name="cantitate_{{ i }}" value="{{ l.cantitate or '' }}" placeholder="1"></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <p class="form-text">Rândurile fără medicament sunt ignorate. Rețeta și toate medicamentele ei se salvează într-o singură tranzacție.</p>
+    <button class="btn btn-primary">Salvează rețeta</button>
+    <a class="btn btn-link" href="{{ url_for('consultatii.detalii', id=c.id_consultatie) }}">Renunță</a>
+  </form>
+</div></div>
+{% endblock %}

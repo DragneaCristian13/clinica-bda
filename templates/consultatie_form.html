@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Consultație{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-8">
+  <h1 class="h3 mb-1">{{ 'Consultație nouă' if nou else 'Editare consultație' }}</h1>
+  <p class="text-muted">Pacient: <strong>{{ pr.pacient }}</strong> · programare din {{ pr.data_ora|dt }}
+    {% if pr.motiv %}· motiv: {{ pr.motiv }}{% endif %}</p>
+  <div class="card"><div class="card-body">
+    <form method="post">
+      {% if nou %}<input type="hidden" name="programare" value="{{ request.values.get('programare') }}">{% endif %}
+      <div class="mb-3"><label class="form-label" for="simptome">Simptome</label>
+        <textarea class="form-control" id="simptome" name="simptome" rows="3">{{ item.simptome or '' }}</textarea></div>
+      <div class="mb-3"><label class="form-label" for="diagnostic">Diagnostic *</label>
+        <textarea class="form-control" id="diagnostic" name="diagnostic" rows="2" required>{{ item.diagnostic or '' }}</textarea></div>
+      <div class="mb-3"><label class="form-label" for="recomandari">Recomandări</label>
+        <textarea class="form-control" id="recomandari" name="recomandari" rows="3">{{ item.recomandari or '' }}</textarea></div>
+      <button class="btn btn-primary">Salvează</button>
+      <a class="btn btn-link" href="{{ url_for('consultatii.lista') }}">Renunță</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

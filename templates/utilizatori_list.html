@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_macros.html" import buton_stergere with context %}
+{% block title %}Utilizatori{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Utilizatori <small class="text-muted fs-6">({{ rows|length }})</small></h1>
+  <a class="btn btn-primary" href="{{ url_for('auth.utilizatori_create') }}"><i class="bi bi-person-plus"></i> Cont nou</a>
+</div>
+<form class="row g-2 mb-3">
+  <div class="col-md-5"><input class="form-control" name="q" value="{{ q }}" placeholder="Caută după email"></div>
+  <div class="col-md-3"><select class="form-select" name="rol"><option value="">toate rolurile</option>
+    {% for r in roluri %}<option {{ 'selected' if rol == r }}>{{ r }}</option>{% endfor %}</select></div>
+  <div class="col-auto"><button class="btn btn-outline-primary">Filtrează</button></div>
+</form>
+<div class="card"><table class="table table-hover mb-0">
+  <thead><tr><th>Email</th><th>Rol</th><th>Persoană</th><th>Activ</th><th>Ultima autentificare</th><th class="text-end">Acțiuni</th></tr></thead>
+  <tbody>
+  {% for u in rows %}
+    <tr class="{{ '' if u.activ else 'text-muted' }}">
+      <td>{{ u.email }}</td>
+      <td><span class="badge text-bg-{{ {'admin':'danger','receptioner':'warning','medic':'info','pacient':'light'}[u.rol] }}">{{ u.rol }}</span></td>
+      <td>{{ u.persoana }}</td>
+      <td>{{ '✔' if u.activ else '✘' }}</td>
+      <td>{{ u.ultima_autentificare|dt }}</td>
+      <td class="text-end text-nowrap">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('auth.utilizatori_edit', id=u.id_utilizator) }}"><i class="bi bi-pencil"></i></a>
+        {% if u.id_utilizator != g.user.id_utilizator %}
+          {{ buton_stergere(url_for('auth.utilizatori_delete', id=u.id_utilizator), 'Ștergi contul? Persoana (medic/pacient) rămâne în baza de date.') }}
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

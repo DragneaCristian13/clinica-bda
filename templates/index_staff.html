@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge with context %}
+{% block title %}Acasă{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Panou {{ 'administrator' if g.user.rol == 'admin' else 'recepție' }}</h1>
+<div class="row g-3 mb-4">
+  {% for eticheta, valoare, icon in [('Pacienți', stats.pacienti, 'people'), ('Medici', stats.medici, 'person-badge'),
+                                    ('Programări azi', stats.azi, 'calendar-day'), ('Programări viitoare', stats.viitoare, 'calendar-week'),
+                                    ('Consultații', stats.consultatii, 'clipboard2-pulse')] %}
+  <div class="col-6 col-md">
+    <div class="card"><div class="card-body">
+      <div class="text-muted small"><i class="bi bi-{{ icon }}"></i> {{ eticheta }}</div>
+      <div class="stat">{{ valoare }}</div>
+    </div></div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h2 class="h5 mb-0">Următoarele programări</h2>
+  <div>
+    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('pacienti.creare') }}"><i class="bi bi-person-plus"></i> Pacient nou</a>
+    <a class="btn btn-sm btn-primary" href="{{ url_for('programari.creare') }}"><i class="bi bi-calendar-plus"></i> Programare nouă</a>
+  </div>
+</div>
+<div class="card"><table class="table table-hover mb-0">
+  <thead><tr><th>Data</th><th>Pacient</th><th>Medic</th><th>Specializare</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for r in urmatoare %}
+    <tr><td>{{ r.data_ora|dt }}</td><td>{{ r.pacient }}</td><td>{{ r.medic }}</td>
+        <td>{{ r.specializare }}</td><td>{{ status_badge(r.status) }}</td></tr>
+  {% else %}
+    <tr><td colspan="5" class="text-muted text-center">Nu există programări viitoare.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

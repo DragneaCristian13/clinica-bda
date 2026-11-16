@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "_macros.html" import camp %}
+{% block title %}Medicament{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-8">
+  <h1 class="h3 mb-3">{{ 'Medicament nou' if nou else 'Editare medicament' }}</h1>
+  <div class="card"><div class="card-body">
+    <form method="post">
+      <div class="row">
+        <div class="col-md-6">{{ camp('denumire', 'Denumire comercială', item.denumire, required=true) }}</div>
+        <div class="col-md-6">{{ camp('substanta_activa', 'Substanță activă', item.substanta_activa, required=true) }}</div>
+        <div class="col-md-6">{{ camp('forma', 'Formă', item.forma, required=true, help='ex: comprimate, sirop, cremă') }}</div>
+        <div class="col-md-6">{{ camp('concentratie', 'Concentrație', item.concentratie, required=true, help='ex: 500 mg') }}</div>
+      </div>
+      <button class="btn btn-primary">Salvează</button>
+      <a class="btn btn-link" href="{{ url_for('nomenclatoare.medicamente_lista') }}">Renunță</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

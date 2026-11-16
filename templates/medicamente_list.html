@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_macros.html" import buton_stergere with context %}
+{% block title %}Medicamente{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Medicamente</h1>
+  {% if are_rol('admin') %}
+    <a class="btn btn-primary" href="{{ url_for('nomenclatoare.medicamente_form') }}"><i class="bi bi-plus-lg"></i> Medicament nou</a>
+  {% endif %}
+</div>
+<form class="row g-2 mb-3">
+  <div class="col-md-6"><input class="form-control" name="q" value="{{ q }}" placeholder="Caută după denumire sau substanță activă"></div>
+  <div class="col-auto"><button class="btn btn-outline-primary">Caută</button></div>
+</form>
+<div class="card"><table class="table table-hover mb-0">
+  <thead><tr><th>Denumire</th><th>Substanță activă</th><th>Formă</th><th>Concentrație</th><th>Prescrieri</th>
+             {% if are_rol('admin') %}<th class="text-end">Acțiuni</th>{% endif %}</tr></thead>
+  <tbody>
+  {% for m in rows %}
+    <tr><td>{{ m.denumire }}</td><td>{{ m.substanta_activa }}</td><td>{{ m.forma }}</td><td>{{ m.concentratie }}</td><td>{{ m.prescrieri }}</td>
+      {% if are_rol('admin') %}
+      <td class="text-end text-nowrap">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('nomenclatoare.medicamente_form', id=m.id_medicament) }}"><i class="bi bi-pencil"></i></a>
+        {{ buton_stergere(url_for('nomenclatoare.medicamente_stergere', id=m.id_medicament)) }}
+      </td>
+      {% endif %}
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="text-center text-muted">Niciun medicament găsit.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

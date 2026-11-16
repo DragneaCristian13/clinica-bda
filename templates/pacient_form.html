@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import camp %}
+{% block title %}{{ 'Pacient nou' if nou else 'Editare pacient' }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-8">
+  <h1 class="h3 mb-3">{{ 'Pacient nou' if nou else 'Editare pacient' }}</h1>
+  <div class="card"><div class="card-body">
+    <form method="post">
+      <div class="row">
+        <div class="col-md-6">{{ camp('nume', 'Nume', item.nume, required=true) }}</div>
+        <div class="col-md-6">{{ camp('prenume', 'Prenume', item.prenume, required=true) }}</div>
+        <div class="col-md-6">{{ camp('cnp', 'CNP', item.cnp, required=true, help='13 cifre',
+                                       attrs='pattern="[1-8][0-9]{12}" maxlength="13"') }}</div>
+        <div class="col-md-3">{{ camp('data_nasterii', 'Data nașterii', item.data_nasterii|input_d, type='date', required=true) }}</div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label" for="sex">Sex *</label>
+          <select class="form-select" id="sex" name="sex" required>
+            <option value="M" {{ 'selected' if item.sex == 'M' }}>M</option>
+            <option value="F" {{ 'selected' if item.sex == 'F' }}>F</option>
+          </select>
+        </div>
+        <div class="col-md-6">{{ camp('telefon', 'Telefon', item.telefon, type='tel') }}</div>
+        <div class="col-md-6">{{ camp('email', 'Email', item.email, type='email') }}</div>
+        <div class="col-12">{{ camp('adresa', 'Adresă', item.adresa) }}</div>
+      </div>
+      <button class="btn btn-primary">Salvează</button>
+      <a class="btn btn-link" href="{{ url_for('pacienti.lista') }}">Renunță</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

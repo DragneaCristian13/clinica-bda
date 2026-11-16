@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Acasă{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Bună ziua, dr. {{ g.user.nume }}</h1>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">Programări viitoare</div><div class="stat">{{ stats.viitoare }}</div></div></div></div>
+  <div class="col-6 col-md-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">Consultații finalizate</div><div class="stat">{{ stats.finalizate }}</div></div></div></div>
+</div>
+<h2 class="h5">Programările mele de azi și din zilele următoare</h2>
+<div class="card"><table class="table table-hover mb-0">
+  <thead><tr><th>Data</th><th>Pacient</th><th>Motiv</th><th class="text-end">Acțiuni</th></tr></thead>
+  <tbody>
+  {% for r in urmatoare %}
+    <tr>
+      <td>{{ r.data_ora|dt }}</td>
+      <td><a href="{{ url_for('pacienti.detalii', id=r.id_pacient) }}">{{ r.pacient }}</a></td>
+      <td>{{ r.motiv or '—' }}</td>
+      <td class="text-end">
+        <form method="post" action="{{ url_for('programari.schimba_status', id=r.id_programare) }}" class="d-inline">
+          <button name="status" value="finalizat" class="btn btn-sm btn-success">Finalizează și completează consultația</button>
+          <button name="status" value="anulat" class="btn btn-sm btn-outline-secondary">Anulează</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4" class="text-muted text-center">Nu ai programări viitoare.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

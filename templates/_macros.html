@@ -1,0 +1,32 @@
+{% macro status_badge(status) -%}
+  {%- set culori = {'programat': 'primary', 'finalizat': 'success', 'anulat': 'secondary'} -%}
+  <span class="badge text-bg-{{ culori.get(status, 'light') }}">{{ status }}</span>
+{%- endmacro %}
+
+{% macro buton_stergere(url, mesaj='Sigur ștergi?') -%}
+  <form method="post" action="{{ url }}" class="d-inline" onsubmit="return confirm('{{ mesaj }}')">
+    <button class="btn btn-sm btn-outline-danger" title="Șterge"><i class="bi bi-trash"></i></button>
+  </form>
+{%- endmacro %}
+
+{% macro paginare(pagina, pagini, endpoint) -%}
+  {% if pagini > 1 %}
+  {% set args = request.args.to_dict() %}
+  <nav><ul class="pagination pagination-sm justify-content-center">
+    <li class="page-item {{ 'disabled' if pagina <= 1 }}">
+      <a class="page-link" href="{{ url_for(endpoint, **dict(args, page=pagina-1)) }}">&laquo;</a></li>
+    <li class="page-item disabled"><span class="page-link">pagina {{ pagina }} / {{ pagini }}</span></li>
+    <li class="page-item {{ 'disabled' if pagina >= pagini }}">
+      <a class="page-link" href="{{ url_for(endpoint, **dict(args, page=pagina+1)) }}">&raquo;</a></li>
+  </ul></nav>
+  {% endif %}
+{%- endmacro %}
+
+{% macro camp(name, label, value='', type='text', required=false, help=none, attrs='') -%}
+  <div class="mb-3">
+    <label class="form-label" for="{{ name }}">{{ label }}{% if required %} *{% endif %}</label>
+    <input class="form-control" id="{{ name }}" name="{{ name }}" type="{{ type }}"
+           value="{{ value if value is not none else '' }}" {{ 'required' if required }} {{ attrs|safe }}>
+    {% if help %}<div class="form-text">{{ help }}</div>{% endif %}
+  </div>
+{%- endmacro %}
