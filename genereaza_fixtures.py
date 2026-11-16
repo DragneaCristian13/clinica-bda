@@ -2,7 +2,7 @@
 """
 Generator de fixtures pentru baza de date a clinicii (Etapa 1).
 
-Produce 02_seed.sql cu date realiste și consistente:
+Produce sql/02_seed.sql cu date realiste și consistente:
   - CNP-uri valide (cu cifră de control corectă)
   - programări fără suprapuneri pe medic, doar în zile lucrătoare 08:00-16:00
   - consultații doar pentru programările finalizate
@@ -153,7 +153,7 @@ def main():
     ap.add_argument("--programari", type=int, default=300)
     ap.add_argument("--azi", default="2026-11-01", help="data de referință (trecut/viitor)")
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--out", default="02_seed.sql")
+    ap.add_argument("--out", default="sql/02_seed.sql")
     a = ap.parse_args()
     random.seed(a.seed)
     azi = datetime.fromisoformat(a.azi)
